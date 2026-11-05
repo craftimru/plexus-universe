@@ -1,0 +1,1076 @@
+{
+  "built_at": 1793905464,
+  "fresh_hours": 48,
+  "project": "Project Universe Core (Template)",
+  "engine": "Universal (Godot / Unreal / Unity / Custom)",
+  "status_names": {
+    "idea": "Идея / план",
+    "art": "Арт и референсы",
+    "proto": "Прототип",
+    "wip": "В разработке",
+    "live": "Работает в игре",
+    "polished": "Отполировано",
+    "shelved": "Отложено"
+  },
+  "nodes": [
+    {
+      "id": "engine_core",
+      "label": "Engine Core",
+      "tier": 0,
+      "parent": null,
+      "children": [
+        "pillar_match",
+        "pillar_combat",
+        "pillar_economy",
+        "pillar_navigation",
+        "pillar_ai",
+        "pillar_visuals",
+        "pillar_ui_audio"
+      ],
+      "family": "engine_core",
+      "color": "#ffe39a",
+      "status": "live",
+      "status_text": "Работает в игре",
+      "human": "Центральное ядро симуляции и цикл обновления: координация всех игровых сервисов, жизненный цикл и менеджмент событий.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": true,
+          "at": 1793905366
+        },
+        {
+          "k": "tests",
+          "label": "тесты tests/test_core.py",
+          "on": true,
+          "at": 1793905366
+        },
+        {
+          "k": "docs",
+          "label": "GDD/доки",
+          "on": true,
+          "at": 1793905366
+        }
+      ],
+      "at": 1793905366,
+      "agg_at": 1793905366,
+      "changes": [
+        {
+          "path": "build_graph.py",
+          "at": 1793905366
+        },
+        {
+          "path": "viewer.js",
+          "at": 1793905359
+        },
+        {
+          "path": "index.html",
+          "at": 1793905355
+        },
+        {
+          "path": "SKILL.md",
+          "at": 1793681001
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "build_graph.py",
+        "viewer.js",
+        "index.html",
+        "SKILL.md"
+      ],
+      "size": 30.8,
+      "flag": null,
+      "codex_label": "Engine Core",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": [
+        "tests/test_core.py"
+      ]
+    },
+    {
+      "id": "pillar_match",
+      "label": "Матч и Симуляция",
+      "tier": 1,
+      "parent": "engine_core",
+      "children": [
+        "sys_match_state"
+      ],
+      "family": "pillar_match",
+      "color": "#9fb8d0",
+      "status": "live",
+      "status_text": "Работает в игре",
+      "human": "Контроллер матча, игровое состояние, репликация кадров, правила победы и поражения.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": true,
+          "at": 1793905366
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        }
+      ],
+      "at": 1793905366,
+      "agg_at": 1793905366,
+      "changes": [
+        {
+          "path": "build_graph.py",
+          "at": 1793905366
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "build_graph.py"
+      ],
+      "size": 16.4,
+      "flag": null,
+      "codex_label": "Матч и Симуляция",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    },
+    {
+      "id": "pillar_combat",
+      "label": "Бой и Юниты",
+      "tier": 1,
+      "parent": "engine_core",
+      "children": [
+        "sys_damage_model"
+      ],
+      "family": "pillar_combat",
+      "color": "#ff6f4d",
+      "status": "live",
+      "status_text": "Работает в игре",
+      "human": "Боевой расчет, нанесение урона, радиусы стрельбы, типы снарядов и характеристики юнитов.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": false,
+          "at": 1793905359
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        }
+      ],
+      "at": 1793905359,
+      "agg_at": 1793905359,
+      "changes": [
+        {
+          "path": "viewer.js",
+          "at": 1793905359
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "viewer.js"
+      ],
+      "size": 16.4,
+      "flag": null,
+      "codex_label": "Бой и Юниты",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    },
+    {
+      "id": "pillar_economy",
+      "label": "Экономика и Ресурсы",
+      "tier": 1,
+      "parent": "engine_core",
+      "children": [
+        "sys_economy_core"
+      ],
+      "family": "pillar_economy",
+      "color": "#ffc64a",
+      "status": "live",
+      "status_text": "Работает в игре",
+      "human": "Двухуровневая модель ресурсов, добыча харвестерами, энергосети и очереди строительства.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": false,
+          "at": 1793681001
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        },
+        {
+          "k": "docs",
+          "label": "GDD/доки",
+          "on": true,
+          "at": 1793681001
+        }
+      ],
+      "at": 1793681001,
+      "agg_at": 1793681001,
+      "changes": [
+        {
+          "path": "SKILL.md",
+          "at": 1793681001
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "SKILL.md"
+      ],
+      "size": 16.4,
+      "flag": null,
+      "codex_label": "Экономика и Ресурсы",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    },
+    {
+      "id": "pillar_navigation",
+      "label": "Навигация и Навмеш",
+      "tier": 1,
+      "parent": "engine_core",
+      "children": [
+        "sys_pathfinding_2d_3d"
+      ],
+      "family": "pillar_navigation",
+      "color": "#3ee58f",
+      "status": "live",
+      "status_text": "Работает в игре",
+      "human": "Двухдоменный поиск пути: наземные сетки проходимости и высотные эшелоны авиации.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": true,
+          "at": 1793905366
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        }
+      ],
+      "at": 1793905366,
+      "agg_at": 1793905366,
+      "changes": [
+        {
+          "path": "build_graph.py",
+          "at": 1793905366
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "build_graph.py"
+      ],
+      "size": 16.4,
+      "flag": null,
+      "codex_label": "Навигация и Навмеш",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    },
+    {
+      "id": "pillar_ai",
+      "label": "Тактический ИИ",
+      "tier": 1,
+      "parent": "engine_core",
+      "children": [
+        "sys_ai_commander"
+      ],
+      "family": "pillar_ai",
+      "color": "#e06c75",
+      "status": "wip",
+      "status_text": "В разработке",
+      "human": "Многоуровневый ИИ: стратегический макро-директор, тактический анализ фронта и микро-управление юнитами.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": false,
+          "at": 1793905359
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        }
+      ],
+      "at": 1793905359,
+      "agg_at": 1793905359,
+      "changes": [
+        {
+          "path": "viewer.js",
+          "at": 1793905359
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "viewer.js"
+      ],
+      "size": 16.4,
+      "flag": null,
+      "codex_label": "Тактический ИИ",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    },
+    {
+      "id": "pillar_visuals",
+      "label": "Визуальный слой и VFX",
+      "tier": 1,
+      "parent": "engine_core",
+      "children": [],
+      "family": "pillar_visuals",
+      "color": "#ff62b4",
+      "status": "live",
+      "status_text": "Работает в игре",
+      "human": "Шейдеры ландшафта, 3D-модели, анимации, системы частиц взрывов и выстрелов.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": false,
+          "at": 1793905355
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        }
+      ],
+      "at": 1793905355,
+      "agg_at": 1793905355,
+      "changes": [
+        {
+          "path": "index.html",
+          "at": 1793905355
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "index.html"
+      ],
+      "size": 16.0,
+      "flag": null,
+      "codex_label": "Визуальный слой и VFX",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    },
+    {
+      "id": "pillar_ui_audio",
+      "label": "Интерфейс и Аудио",
+      "tier": 1,
+      "parent": "engine_core",
+      "children": [
+        "sys_hud_minimap"
+      ],
+      "family": "pillar_ui_audio",
+      "color": "#35d6f0",
+      "status": "proto",
+      "status_text": "Прототип",
+      "human": "Тактическая миникарта, командная панель приказов, селектор отрядов и пространственный 3D-звук.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": false,
+          "at": 1793325030
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        }
+      ],
+      "at": 1793325030,
+      "agg_at": 1793905355,
+      "changes": [
+        {
+          "path": "open_graph.bat",
+          "at": 1793325030
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "open_graph.bat"
+      ],
+      "size": 16.4,
+      "flag": null,
+      "codex_label": "Интерфейс и Аудио",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    },
+    {
+      "id": "sys_match_state",
+      "label": "Система Состояний Матча",
+      "tier": 2,
+      "parent": "pillar_match",
+      "children": [],
+      "family": "pillar_match",
+      "color": "#9fb8d0",
+      "status": "live",
+      "status_text": "Работает в игре",
+      "human": "Управляет переходами лобби -> пре-матч -> активная фаза -> подведение итогов.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": true,
+          "at": 1793905366
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        }
+      ],
+      "at": 1793905366,
+      "agg_at": 1793905366,
+      "changes": [
+        {
+          "path": "build_graph.py",
+          "at": 1793905366
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "build_graph.py"
+      ],
+      "size": 11.0,
+      "flag": null,
+      "codex_label": "Система Состояний Матча",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    },
+    {
+      "id": "sys_damage_model",
+      "label": "Баллистика и Урон",
+      "tier": 2,
+      "parent": "pillar_combat",
+      "children": [
+        "unit_main_battle_tank"
+      ],
+      "family": "pillar_combat",
+      "color": "#ff6f4d",
+      "status": "live",
+      "status_text": "Работает в игре",
+      "human": "Расчет бронепробития, кинетических рикошетов и сплэш-урона взрывных волн.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": false,
+          "at": 1793905359
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        }
+      ],
+      "at": 1793905359,
+      "agg_at": 1793905359,
+      "changes": [
+        {
+          "path": "viewer.js",
+          "at": 1793905359
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "viewer.js"
+      ],
+      "size": 11.4,
+      "flag": null,
+      "codex_label": "Баллистика и Урон",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    },
+    {
+      "id": "sys_economy_core",
+      "label": "Ядро Экономики",
+      "tier": 2,
+      "parent": "pillar_economy",
+      "children": [
+        "unit_harvester"
+      ],
+      "family": "pillar_economy",
+      "color": "#ffc64a",
+      "status": "live",
+      "status_text": "Работает в игре",
+      "human": "Изолированное математическое ядро транзакций, складов и баланса сырья.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": false,
+          "at": 1793681001
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        },
+        {
+          "k": "docs",
+          "label": "GDD/доки",
+          "on": true,
+          "at": 1793681001
+        }
+      ],
+      "at": 1793681001,
+      "agg_at": 1793681001,
+      "changes": [
+        {
+          "path": "SKILL.md",
+          "at": 1793681001
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "SKILL.md"
+      ],
+      "size": 11.4,
+      "flag": null,
+      "codex_label": "Ядро Экономики",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    },
+    {
+      "id": "sys_pathfinding_2d_3d",
+      "label": "Поиск Пути A* / Flowfield",
+      "tier": 2,
+      "parent": "pillar_navigation",
+      "children": [
+        "module_flowfield_cache"
+      ],
+      "family": "pillar_navigation",
+      "color": "#3ee58f",
+      "status": "live",
+      "status_text": "Работает в игре",
+      "human": "Оптимизированный поиск маршрутов для сотен юнитов одновременно с обходом динамических препятствий.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": true,
+          "at": 1793905366
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        }
+      ],
+      "at": 1793905366,
+      "agg_at": 1793905366,
+      "changes": [
+        {
+          "path": "build_graph.py",
+          "at": 1793905366
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "build_graph.py"
+      ],
+      "size": 11.4,
+      "flag": null,
+      "codex_label": "Поиск Пути A* / Flowfield",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    },
+    {
+      "id": "sys_ai_commander",
+      "label": "ИИ-Главнокомандующий",
+      "tier": 2,
+      "parent": "pillar_ai",
+      "children": [],
+      "family": "pillar_ai",
+      "color": "#e06c75",
+      "status": "wip",
+      "status_text": "В разработке",
+      "human": "Оценивает баланс сил, планирует наступательные коридоры и управляет базой.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": false,
+          "at": 1793905359
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        }
+      ],
+      "at": 1793905359,
+      "agg_at": 1793905359,
+      "changes": [
+        {
+          "path": "viewer.js",
+          "at": 1793905359
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "viewer.js"
+      ],
+      "size": 11.0,
+      "flag": null,
+      "codex_label": "ИИ-Главнокомандующий",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    },
+    {
+      "id": "sys_hud_minimap",
+      "label": "Тактическая Миникарта",
+      "tier": 2,
+      "parent": "pillar_ui_audio",
+      "children": [],
+      "family": "pillar_ui_audio",
+      "color": "#35d6f0",
+      "status": "proto",
+      "status_text": "Прототип",
+      "human": "Векторный рендер позиций с туманом войны и индикацией сигналов тревоги.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": false,
+          "at": 1793905355
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        }
+      ],
+      "at": 1793905355,
+      "agg_at": 1793905355,
+      "changes": [
+        {
+          "path": "index.html",
+          "at": 1793905355
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "index.html"
+      ],
+      "size": 11.0,
+      "flag": null,
+      "codex_label": "Тактическая Миникарта",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    },
+    {
+      "id": "unit_harvester",
+      "label": "Тяжелый Харвестер",
+      "tier": 3,
+      "parent": "sys_economy_core",
+      "children": [],
+      "family": "pillar_economy",
+      "color": "#ffc64a",
+      "status": "live",
+      "status_text": "Работает в игре",
+      "human": "Машина добычи ресурсов: обладает высшим дорожным приоритетом в логистическом трафике.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": false,
+          "at": 1793681001
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        },
+        {
+          "k": "docs",
+          "label": "GDD/доки",
+          "on": true,
+          "at": 1793681001
+        }
+      ],
+      "at": 1793681001,
+      "agg_at": 1793681001,
+      "changes": [
+        {
+          "path": "SKILL.md",
+          "at": 1793681001
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "SKILL.md"
+      ],
+      "size": 7.5,
+      "flag": null,
+      "codex_label": "Тяжелый Харвестер",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    },
+    {
+      "id": "unit_main_battle_tank",
+      "label": "Основной Боевой Танк",
+      "tier": 3,
+      "parent": "sys_damage_model",
+      "children": [],
+      "family": "pillar_combat",
+      "color": "#ff6f4d",
+      "status": "live",
+      "status_text": "Работает в игре",
+      "human": "Гусеничная бронетехника с тяжелым орудием и круговой башней.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": false,
+          "at": 1793905359
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        }
+      ],
+      "at": 1793905359,
+      "agg_at": 1793905359,
+      "changes": [
+        {
+          "path": "viewer.js",
+          "at": 1793905359
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "viewer.js"
+      ],
+      "size": 7.5,
+      "flag": null,
+      "codex_label": "Основной Боевой Танк",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    },
+    {
+      "id": "module_flowfield_cache",
+      "label": "Кэш Полей Векторов (Flowfield)",
+      "tier": 3,
+      "parent": "sys_pathfinding_2d_3d",
+      "children": [],
+      "family": "pillar_navigation",
+      "color": "#3ee58f",
+      "status": "live",
+      "status_text": "Работает в игре",
+      "human": "Кэшированные карты направлений движения для группового перемещения армий без коллизий.",
+      "hero": null,
+      "sats": [],
+      "arts": [],
+      "facets": [
+        {
+          "k": "code",
+          "label": "код",
+          "on": true,
+          "at": 1793905366
+        },
+        {
+          "k": "tests",
+          "label": "тесты",
+          "on": false,
+          "at": null
+        }
+      ],
+      "at": 1793905366,
+      "agg_at": 1793905366,
+      "changes": [
+        {
+          "path": "build_graph.py",
+          "at": 1793905366
+        }
+      ],
+      "proposed": false,
+      "autoexpand": false,
+      "paths": [
+        "build_graph.py"
+      ],
+      "size": 7.5,
+      "flag": null,
+      "codex_label": "Кэш Полей Векторов (Flowfield)",
+      "note": "",
+      "codex_state": "Активный модуль",
+      "tests": []
+    }
+  ],
+  "links": [
+    {
+      "source": "sys_match_state",
+      "target": "sys_economy_core",
+      "type": "calls",
+      "label": "инициализация счетов",
+      "proposed": false
+    },
+    {
+      "source": "sys_ai_commander",
+      "target": "sys_match_state",
+      "type": "reads_state",
+      "label": "чтение расстановки",
+      "proposed": false
+    },
+    {
+      "source": "sys_ai_commander",
+      "target": "sys_pathfinding_2d_3d",
+      "type": "calls",
+      "label": "запрос маршрута",
+      "proposed": false
+    },
+    {
+      "source": "unit_main_battle_tank",
+      "target": "sys_damage_model",
+      "type": "calls",
+      "label": "выстрел",
+      "proposed": false
+    },
+    {
+      "source": "unit_harvester",
+      "target": "sys_economy_core",
+      "type": "writes",
+      "label": "разгрузка сырья",
+      "proposed": false
+    },
+    {
+      "source": "unit_harvester",
+      "target": "sys_pathfinding_2d_3d",
+      "type": "calls",
+      "label": "навигация",
+      "proposed": false
+    },
+    {
+      "source": "sys_hud_minimap",
+      "target": "sys_match_state",
+      "type": "reads_state",
+      "label": "позиции юнитов",
+      "proposed": false
+    },
+    {
+      "source": "module_flowfield_cache",
+      "target": "sys_pathfinding_2d_3d",
+      "type": "uses",
+      "label": "расчет векторов",
+      "proposed": false
+    },
+    {
+      "source": "engine_core",
+      "target": "pillar_match",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    },
+    {
+      "source": "engine_core",
+      "target": "pillar_combat",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    },
+    {
+      "source": "engine_core",
+      "target": "pillar_economy",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    },
+    {
+      "source": "engine_core",
+      "target": "pillar_navigation",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    },
+    {
+      "source": "engine_core",
+      "target": "pillar_ai",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    },
+    {
+      "source": "engine_core",
+      "target": "pillar_visuals",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    },
+    {
+      "source": "engine_core",
+      "target": "pillar_ui_audio",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    },
+    {
+      "source": "pillar_match",
+      "target": "sys_match_state",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    },
+    {
+      "source": "pillar_combat",
+      "target": "sys_damage_model",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    },
+    {
+      "source": "pillar_economy",
+      "target": "sys_economy_core",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    },
+    {
+      "source": "pillar_navigation",
+      "target": "sys_pathfinding_2d_3d",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    },
+    {
+      "source": "pillar_ai",
+      "target": "sys_ai_commander",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    },
+    {
+      "source": "pillar_ui_audio",
+      "target": "sys_hud_minimap",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    },
+    {
+      "source": "sys_economy_core",
+      "target": "unit_harvester",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    },
+    {
+      "source": "sys_damage_model",
+      "target": "unit_main_battle_tank",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    },
+    {
+      "source": "sys_pathfinding_2d_3d",
+      "target": "module_flowfield_cache",
+      "type": "subsystem",
+      "label": "",
+      "proposed": false
+    }
+  ],
+  "arts": {},
+  "source": {
+    "project_root": "D:\\GameDev\\GameDevTool\\project-universe-graph",
+    "total_nodes": 17,
+    "total_links": 24
+  }
+}

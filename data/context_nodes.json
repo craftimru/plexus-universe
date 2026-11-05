@@ -1,0 +1,254 @@
+{
+  "engine_core": {
+    "label": "Engine Core",
+    "tier": 0,
+    "parent": null,
+    "family": "engine_core",
+    "status": "live",
+    "summary": "Центральное ядро симуляции и цикл обновления: координация всех игровых сервисов, жизненный цикл и менеджмент событий.",
+    "paths": [
+      "build_graph.py",
+      "viewer.js",
+      "index.html",
+      "SKILL.md"
+    ],
+    "tests": [
+      "tests/test_core.py"
+    ],
+    "children": [
+      "pillar_match",
+      "pillar_combat",
+      "pillar_economy",
+      "pillar_navigation",
+      "pillar_ai",
+      "pillar_visuals",
+      "pillar_ui_audio"
+    ]
+  },
+  "pillar_match": {
+    "label": "Матч и Симуляция",
+    "tier": 1,
+    "parent": "engine_core",
+    "family": "pillar_match",
+    "status": "live",
+    "summary": "Контроллер матча, игровое состояние, репликация кадров, правила победы и поражения.",
+    "paths": [
+      "build_graph.py"
+    ],
+    "tests": [],
+    "children": [
+      "sys_match_state"
+    ]
+  },
+  "pillar_combat": {
+    "label": "Бой и Юниты",
+    "tier": 1,
+    "parent": "engine_core",
+    "family": "pillar_combat",
+    "status": "live",
+    "summary": "Боевой расчет, нанесение урона, радиусы стрельбы, типы снарядов и характеристики юнитов.",
+    "paths": [
+      "viewer.js"
+    ],
+    "tests": [],
+    "children": [
+      "sys_damage_model"
+    ]
+  },
+  "pillar_economy": {
+    "label": "Экономика и Ресурсы",
+    "tier": 1,
+    "parent": "engine_core",
+    "family": "pillar_economy",
+    "status": "live",
+    "summary": "Двухуровневая модель ресурсов, добыча харвестерами, энергосети и очереди строительства.",
+    "paths": [
+      "SKILL.md"
+    ],
+    "tests": [],
+    "children": [
+      "sys_economy_core"
+    ]
+  },
+  "pillar_navigation": {
+    "label": "Навигация и Навмеш",
+    "tier": 1,
+    "parent": "engine_core",
+    "family": "pillar_navigation",
+    "status": "live",
+    "summary": "Двухдоменный поиск пути: наземные сетки проходимости и высотные эшелоны авиации.",
+    "paths": [
+      "build_graph.py"
+    ],
+    "tests": [],
+    "children": [
+      "sys_pathfinding_2d_3d"
+    ]
+  },
+  "pillar_ai": {
+    "label": "Тактический ИИ",
+    "tier": 1,
+    "parent": "engine_core",
+    "family": "pillar_ai",
+    "status": "wip",
+    "summary": "Многоуровневый ИИ: стратегический макро-директор, тактический анализ фронта и микро-управление юнитами.",
+    "paths": [
+      "viewer.js"
+    ],
+    "tests": [],
+    "children": [
+      "sys_ai_commander"
+    ]
+  },
+  "pillar_visuals": {
+    "label": "Визуальный слой и VFX",
+    "tier": 1,
+    "parent": "engine_core",
+    "family": "pillar_visuals",
+    "status": "live",
+    "summary": "Шейдеры ландшафта, 3D-модели, анимации, системы частиц взрывов и выстрелов.",
+    "paths": [
+      "index.html"
+    ],
+    "tests": [],
+    "children": []
+  },
+  "pillar_ui_audio": {
+    "label": "Интерфейс и Аудио",
+    "tier": 1,
+    "parent": "engine_core",
+    "family": "pillar_ui_audio",
+    "status": "proto",
+    "summary": "Тактическая миникарта, командная панель приказов, селектор отрядов и пространственный 3D-звук.",
+    "paths": [
+      "open_graph.bat"
+    ],
+    "tests": [],
+    "children": [
+      "sys_hud_minimap"
+    ]
+  },
+  "sys_match_state": {
+    "label": "Система Состояний Матча",
+    "tier": 2,
+    "parent": "pillar_match",
+    "family": "pillar_match",
+    "status": "live",
+    "summary": "Управляет переходами лобби -> пре-матч -> активная фаза -> подведение итогов.",
+    "paths": [
+      "build_graph.py"
+    ],
+    "tests": [],
+    "children": []
+  },
+  "sys_damage_model": {
+    "label": "Баллистика и Урон",
+    "tier": 2,
+    "parent": "pillar_combat",
+    "family": "pillar_combat",
+    "status": "live",
+    "summary": "Расчет бронепробития, кинетических рикошетов и сплэш-урона взрывных волн.",
+    "paths": [
+      "viewer.js"
+    ],
+    "tests": [],
+    "children": [
+      "unit_main_battle_tank"
+    ]
+  },
+  "sys_economy_core": {
+    "label": "Ядро Экономики",
+    "tier": 2,
+    "parent": "pillar_economy",
+    "family": "pillar_economy",
+    "status": "live",
+    "summary": "Изолированное математическое ядро транзакций, складов и баланса сырья.",
+    "paths": [
+      "SKILL.md"
+    ],
+    "tests": [],
+    "children": [
+      "unit_harvester"
+    ]
+  },
+  "sys_pathfinding_2d_3d": {
+    "label": "Поиск Пути A* / Flowfield",
+    "tier": 2,
+    "parent": "pillar_navigation",
+    "family": "pillar_navigation",
+    "status": "live",
+    "summary": "Оптимизированный поиск маршрутов для сотен юнитов одновременно с обходом динамических препятствий.",
+    "paths": [
+      "build_graph.py"
+    ],
+    "tests": [],
+    "children": [
+      "module_flowfield_cache"
+    ]
+  },
+  "sys_ai_commander": {
+    "label": "ИИ-Главнокомандующий",
+    "tier": 2,
+    "parent": "pillar_ai",
+    "family": "pillar_ai",
+    "status": "wip",
+    "summary": "Оценивает баланс сил, планирует наступательные коридоры и управляет базой.",
+    "paths": [
+      "viewer.js"
+    ],
+    "tests": [],
+    "children": []
+  },
+  "sys_hud_minimap": {
+    "label": "Тактическая Миникарта",
+    "tier": 2,
+    "parent": "pillar_ui_audio",
+    "family": "pillar_ui_audio",
+    "status": "proto",
+    "summary": "Векторный рендер позиций с туманом войны и индикацией сигналов тревоги.",
+    "paths": [
+      "index.html"
+    ],
+    "tests": [],
+    "children": []
+  },
+  "unit_harvester": {
+    "label": "Тяжелый Харвестер",
+    "tier": 3,
+    "parent": "sys_economy_core",
+    "family": "pillar_economy",
+    "status": "live",
+    "summary": "Машина добычи ресурсов: обладает высшим дорожным приоритетом в логистическом трафике.",
+    "paths": [
+      "SKILL.md"
+    ],
+    "tests": [],
+    "children": []
+  },
+  "unit_main_battle_tank": {
+    "label": "Основной Боевой Танк",
+    "tier": 3,
+    "parent": "sys_damage_model",
+    "family": "pillar_combat",
+    "status": "live",
+    "summary": "Гусеничная бронетехника с тяжелым орудием и круговой башней.",
+    "paths": [
+      "viewer.js"
+    ],
+    "tests": [],
+    "children": []
+  },
+  "module_flowfield_cache": {
+    "label": "Кэш Полей Векторов (Flowfield)",
+    "tier": 3,
+    "parent": "sys_pathfinding_2d_3d",
+    "family": "pillar_navigation",
+    "status": "live",
+    "summary": "Кэшированные карты направлений движения для группового перемещения армий без коллизий.",
+    "paths": [
+      "build_graph.py"
+    ],
+    "tests": [],
+    "children": []
+  }
+}
