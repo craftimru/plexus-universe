@@ -1,6 +1,6 @@
 "use strict";
 const $ = id => document.getElementById(id);
-let doc, revision, selected, dirty = false, busy = false, mapSelected = null;
+let doc, revision, selected = new URLSearchParams(location.search).get("node"), dirty = false, busy = false, mapSelected = null;
 const message = (text, error = false) => { $("message").textContent = text; $("message").classList.toggle("error", error); };
 const changed = () => { dirty = true; $("save").disabled = busy; message("Есть несохранённые изменения"); };
 function setBusy(value) {

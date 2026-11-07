@@ -48,6 +48,11 @@ canvas#gl{position:fixed;inset:0;z-index:1;display:block}
 .chip{background:var(--glass);border:1px solid var(--line);color:var(--dim);padding:5px 11px;border-radius:16px;cursor:pointer;user-select:none;backdrop-filter:blur(10px);font-size:12px;transition:.2s}
 .chip:hover{color:var(--ink);border-color:rgba(130,170,255,.5)}
 .chip.on{color:#ffe39a;border-color:rgba(255,227,154,.65);box-shadow:0 0 14px rgba(255,227,154,.25)}
+#editMode{font:inherit;white-space:nowrap}
+#editHelp{color:var(--ink);background:#0c1429;border:1px solid var(--line);border-radius:14px;padding:22px;max-width:min(460px,90vw);box-shadow:0 20px 80px #000}
+#editHelp::backdrop{background:rgba(2,4,10,.8)}
+#editHelp h3{margin:0 0 12px}#editHelp p{color:#bfcbea}#editHelp code{color:#ffe39a}
+#editHelp a{color:#9cc1ff}#editHelp .actions{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:20px}
 
 /* левая панель: что нового */
 #news{position:fixed;left:16px;top:64px;z-index:9;width:236px;background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:10px 6px 6px;backdrop-filter:blur(12px)}
@@ -133,6 +138,7 @@ canvas#gl{position:fixed;inset:0;z-index:1;display:block}
   <div id="brand"><i></i>Project Universe Graph</div>
   <div id="crumbs"></div>
   <div class="sp"></div>
+  <button class="chip" id="editMode" type="button">Редактировать</button>
   <div class="chip" id="fFresh" title="Подсветить всё, что менялось недавно">Свежее за 48 ч <b id="freshN"></b></div>
   <input id="search" placeholder="Найти узел…  ( / )" autocomplete="off">
   <div id="results"></div>
@@ -147,9 +153,41 @@ canvas#gl{position:fixed;inset:0;z-index:1;display:block}
 <div id="drawer"><div class="x" id="dx">×</div><div id="dbody"></div></div>
 <div id="lb"><img id="lbi"><div id="lbc" style="color:#9fb0d8"></div></div>
 <div id="err"></div>
+<dialog id="editHelp" aria-labelledby="editHelpTitle">
+  <h3 id="editHelpTitle">Открыть редактор</h3>
+  <p>Для сохранения правок нужен локальный сервер редактора.</p>
+  <p>Запустите <code>edit_graph.bat</code> в папке карты или выполните там:</p>
+  <p><code>python -X utf8 edit_graph.py</code></p>
+  <p>Редактор откроется автоматически. Если сервер уже запущен, перейдите к нему кнопкой ниже. Браузер не может сам запустить Python или BAT-файл.</p>
+  <div class="actions"><a id="editorLocal" href="http://127.0.0.1:8765/editor.html">Открыть запущенный редактор</a><form method="dialog"><button class="chip">Закрыть</button></form></div>
+</dialog>
 
 <script src="three.min.js"></script>
 <script src="data/graph.js"></script>
 <script src="viewer.js"></script>
+<script>
+(function () {
+  const button = document.getElementById("editMode");
+  if (window.self !== window.top) { button.hidden = true; return; }
+  button.onclick = async function () {
+    const node = window.__graph && window.__graph.selected;
+    const suffix = node ? "?node=" + encodeURIComponent(node.id) : "";
+    const help = () => {
+      document.getElementById("editorLocal").href = "http://127.0.0.1:8765/editor.html" + suffix;
+      document.getElementById("editHelp").showModal();
+    };
+    if (location.protocol === "file:") { help(); return; }
+    button.disabled = true;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2500);
+    try {
+      const response = await fetch("/api/document", {signal:controller.signal});
+      if (!response.ok || !(await response.json()).document) throw new Error("Editor unavailable");
+      location.assign(new URL("editor.html" + suffix, location.href));
+    } catch (_) { help(); }
+    finally { clearTimeout(timeout); button.disabled = false; }
+  };
+})();
+</script>
 </body>
 </html>
