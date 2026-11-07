@@ -33,6 +33,12 @@ except ImportError:
         print("Please create graph_content.py based on graph_content.example.py.")
         sys.exit(1)
 
+from graph_store import load_overlay
+
+# Browser edits override descriptive settings, never the project root or Python code.
+for setting, value in load_overlay(HERE).items():
+    setattr(C, setting, value)
+
 PROJECT_ROOT = Path(getattr(C, "PROJECT_ROOT", HERE.parent.parent)).resolve()
 ART_DIR = HERE / "art"
 DATA_DIR = HERE / "data"

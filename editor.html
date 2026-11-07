@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Редактор · Project Universe Graph</title>
+<style>
+:root{color-scheme:dark;font:13px/1.45 "Segoe UI",system-ui,sans-serif;color:#dfe8ff;background:#04060d}
+*{box-sizing:border-box}body{margin:0;display:grid;grid-template-columns:minmax(0,1fr) 360px;height:100vh;overflow:hidden}
+iframe{width:100%;height:100%;border:0}aside{overflow:auto;padding:18px;background:linear-gradient(#0c1429,#070b16);border-left:1px solid #26314b}
+h1{font-size:18px;margin:0 0 5px}h2{font-size:13px;margin:18px 0 8px}p{color:#9aaaca;margin:6px 0 12px}.muted{font-size:11px;color:#8696b8}
+label{display:block;margin:10px 0 4px;font-size:12px;color:#bfcbea}input,textarea,select,button{font:inherit;color:inherit;border:1px solid #34415e;border-radius:7px;background:#101a30;padding:8px;width:100%}textarea{resize:vertical;min-height:65px}button{cursor:pointer}button:hover{border-color:#9ab7ec}button:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:8px;align-items:center}.row>*{min-width:0;flex:1}.primary{background:#29456f;border-color:#5684bd}.danger{color:#ffacac}.toolbar{position:sticky;top:-18px;padding:12px 0;background:#0c1429;z-index:2}#message{font-size:12px;min-height:34px;overflow-wrap:anywhere;padding:5px 0;color:#9ab7ec}#message.error{color:#ffacac}
+details{border-top:1px solid #26314b;margin-top:16px;padding-top:10px}summary{cursor:pointer;color:#bfcbea}.link{padding:8px;margin-top:8px;border:1px solid #26314b;border-radius:8px}.link input,.link select{margin-bottom:6px}.drop{border:1px dashed #6281b3;border-radius:10px;padding:20px 12px;text-align:center;cursor:pointer;color:#a9bfdf;margin:10px 0}.drop.over{background:#1b3152;border-color:#b7d7ff}.gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.image{border:1px solid #34415e;border-radius:8px;overflow:hidden}.image img{width:100%;height:92px;object-fit:cover;display:block}.image button{border:0;border-radius:0;font-size:11px;padding:5px}.image .cover{color:#ffe39a}.image input{border:0;border-radius:0;font-size:11px;padding:5px}
+@media(max-width:900px){body{display:flex;flex-direction:column}iframe{height:45vh;flex:none}aside{flex:1;min-height:0;padding:12px;border-left:0;border-top:1px solid #26314b}}
+</style>
+</head>
+<body>
+<iframe id="map" src="index.html" title="Карта проекта"></iframe>
+<aside>
+<h1>Редактор графа</h1>
+<p>Выберите узел на карте или в списке.</p>
+<div class="toolbar"><div class="row"><button id="save" class="primary" disabled>Сохранить граф</button><button id="reload">Перезагрузить</button></div><div id="message" role="status">Загрузка…</div></div>
+<input id="filter" aria-label="Найти узел" placeholder="Найти узел по названию или ID">
+<select id="nodes" aria-label="Узел" style="margin-top:8px"></select>
+<details><summary>Добавить узел</summary><div class="row" style="margin-top:8px"><input id="new-id" placeholder="ID нового узла"><button id="add">Добавить</button></div><p class="muted">Новый узел будет дочерним для выбранного.</p></details>
+<section id="form" hidden>
+<label for="label">Название</label><input id="label">
+<label for="human">Описание</label><textarea id="human" rows="4"></textarea>
+<div class="row"><div><label for="status">Статус</label><select id="status"><option value="idea">Идея</option><option value="art">Арт готов</option><option value="proto">Прототип</option><option value="wip">В разработке</option><option value="live">Работает</option><option value="polished">Отполировано</option><option value="shelved">Отложено</option></select></div><div><label for="tier">Уровень</label><select id="tier"><option value="0">0 · Проект</option><option value="1">1 · Раздел</option><option value="2">2 · Подсистема</option><option value="3">3 · Сущность</option></select></div></div>
+<label for="parent">Родитель</label><select id="parent"></select>
+<label for="paths">Исходники — по одному пути на строку</label><textarea id="paths" rows="3"></textarea>
+<label for="tests">Тесты — по одному пути на строку</label><textarea id="tests" rows="2"></textarea>
+<details open><summary>Изображения</summary><div id="drop" class="drop" tabindex="0" role="button">Перетащите изображения сюда<br><span class="muted">или нажмите для выбора файлов</span></div><input id="files" type="file" accept="image/*" multiple hidden><div id="gallery" class="gallery"></div><p class="muted">Сохраняются JPEG-миниатюры до 720 × 720. Изображения появятся на карте после сохранения графа.</p></details>
+<details><summary>Исходящие связи</summary><div id="links"></div><button id="add-link" style="margin-top:8px">Добавить связь</button><p class="muted">Связи родитель → потомок создаются автоматически.</p></details>
+<details><summary>Входящие связи</summary><div id="incoming" class="muted"></div></details>
+<button id="delete" class="danger" style="margin-top:20px">Удалить узел</button>
+</section>
+</aside>
+<script src="editor.js"></script>
+</body></html>

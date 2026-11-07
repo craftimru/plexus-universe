@@ -376,5 +376,5 @@
   }
   // старт: показать столпы и общий вид
   setFocus(root, true); cam.dist = 980; crumbs(); requestAnimationFrame(frame);
-  window.__graph = { G, N, cam, expand, collapse, goTo, setFocus, get hover() { return hover; }, links };
+  window.__graph = { G, N, cam, expand, collapse, goTo, setFocus, get hover() { return hover; }, get selected() { return selected; }, links };
 })();

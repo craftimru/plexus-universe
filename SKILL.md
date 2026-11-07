@@ -1,74 +1,48 @@
 ---
 name: project-universe-graph
-description: Indexes game projects (architecture, GDD, scripts, art, scenes) into an interactive 3D Universe Knowledge Graph viewer (Three.js). Tracks freshness, pillars, system dependencies, file paths, and facets. Use when mapping game project structures, providing human-readable visual overviews, or generating fast local context indices for AI agents.
+description: Navigate a manually curated game-project graph to find relevant source files, tests, and dependencies using bounded local queries. Use when working in a project that has Project Universe Graph installed.
 ---
 
-# Project Universe Graph (Интерактивная карта «Вселенной проекта»)
+# Project Universe Graph
 
-Автономный инструмент и навык для создания трехмерной интерактивной карты архитектуры, систем, GDD и ассетов любого игрового проекта (Godot, Unreal, Unity, custom C++).
+Use `graph_agent.py` beside this file to navigate the project's map. Commands below run from the tool's directory; from another directory use its full path. The CLI reads the graph internally and returns only the requested records. Do not load the entire `data/graph.json` or `data/context_nodes.json` into conversation by default.
 
-Позволяет человеку визуально исследовать архитектурный ландшафт игры в браузере (без сервера), а ИИ-агентам — мгновенно находить контекст и связи подсистем без считывания сотен файлов.
+## Find the task's context
 
-## 1. Архитектурные принципы карты
-1. **Иерархия 7±2 (Раскрытие по уровням):**
-   * **Tier 0:** Ядро движка / Проект (`engine_core`).
-   * **Tier 1:** 6–9 фундаментальных столпов (Архитектура, Бой, Экономика, ИИ, Ресурсы, Визуальный слой, UI/Audio).
-   * **Tier 2:** Конкретные подсистемы и менеджеры (`sys_*`).
-   * **Tier 3:** Конкретные сущности, классы юнитов, карточки (`unit_*`, `bld_*`).
-2. **Кодирование статусов (Цветовые кольца жизненного цикла):**
-   * `idea` — Пунктир серо-синий: Идея / план в GDD.
-   * `art` — Сплошное фиолетовое: Арт и референсы готовы.
-   * `proto` — Пунктир янтарный: Прототип / заготовка, не подключен к бою.
-   * `wip` — Бегущая бирюзовая дуга: В активной разработке.
-   * `live` — Зеленое сплошное: Работает в игре.
-   * `polished` — Золотое кольцо: Отполировано и протестировано.
-   * `shelved` — Точки серые: Отложено / бэклог.
-3. **Автоматический трекинг свежести (Freshness & Git Diff):**
-   * Изменено < 6 часов назад: Яркое мерцание + желтый индикатор.
-   * Изменено < 24 часов назад: Мягкое мерцание.
-   * Изменено < 48 часов назад: Метка недавней модификации.
-   * Вычисляется скриптом по `git log` и `mtime` файлов автоматически.
-4. **Связи по запросу (Dependency Rays):**
-   * Направление зависимости показано бегущими частицами света.
-   * Типы связей: `calls` (вызывает), `reads_state` (читает), `writes` (пишет), `owns` (владеет), `renders` (отрисовывает).
-
-## 2. Структура файлов навыка
-
-```
-D:/GameDev/GameDevTool/project-universe-graph/
-├── SKILL.md                 # Описание навыка и правила работы
-├── index.html               # Автономный Three.js HTML-вьюер (работает без локального сервера)
-├── viewer.js                # Движок 3D-графа, орбитальной камеры и карточек
-├── three.min.js             # Графическая библиотека Three.js r128
-├── build_graph.py           # Генератор data/graph.js и data/graph.json из конфигурации проекта
-├── open_graph.bat           # Однокликовый запуск для Windows
-├── art/                     # Оптимизированные миниатюры артов и скриншотов (<=720px)
-└── data/
-    ├── graph.js             # Собранные данные для прямого открытия через file://
-    ├── graph.json           # Чистый JSON для машинного чтения
-    └── context_nodes.json   # Компактный индекс для мгновенного контекстного поиска ИИ
+```sh
+python -X utf8 graph_agent.py search "урон"
+python -X utf8 graph_agent.py node sys_damage_model
+python -X utf8 graph_agent.py context sys_damage_model --direction both --depth 1
 ```
 
-## 3. Как развернуть граф в новом проекте
+- `search` matches ID, label, description and paths; multiple words must all match. It returns up to five brief cards. Try another term if it finds nothing; search is lexical, not semantic.
+- `node` returns one card with description, source paths, test paths and child IDs.
+- `context` follows explicit dependencies, one hop by default. Use `--direction in` for callers, `out` for dependencies, `both` for both. Parent/child edges are excluded unless `--hierarchy` is added. Maximum depth is three; default node limit is eight.
+- `overview` returns the root and top-level sections, five at a time.
+- `path "src/combat/damage.gd"` finds nodes whose source/test paths cover the given file. More specific matches come first; paths are relative to `PROJECT_ROOT`, or absolute beneath it.
 
-### Шаг 1: Скопировать шаблон в директорию инструментов проекта
-```powershell
-Copy-Item -Recurse "D:\GameDev\GameDevTool\project-universe-graph" "D:\PathToYourProject\tools\project_graph"
+For another slice use `--limit` and `--offset` on `search`, `overview` or `path`. Follow `next_offset` to continue. For a child branch, query its ID instead of expanding every branch.
+
+Output is compact JSON, limited to 6,000 characters by default. Change the budget before the command:
+
+```sh
+python -X utf8 graph_agent.py --max-chars 3000 context sys_damage_model --limit 4
 ```
 
-### Шаг 2: Создать `graph_content.py` в проекте
-Описать столпы проекта (`PILLARS`), подсистемы (`NODES`), цвета семейств (`FAMILY`) и файлы путей (`paths`).
+`truncated: true` means records were removed for the character budget. `node_limit_reached: true` means traversal skipped neighbors at the node limit. Narrow the query, navigate by returned IDs, or deliberately increase the limit/budget if needed. An oversized single card returns an error rather than silently hiding its paths. A character limit is not an exact token count.
 
-### Шаг 3: Собрать граф
-```powershell
-python -X utf8 .\tools\project_graph\build_graph.py
+## Read and maintain the relevant sources
+
+Resolve returned paths relative to `PROJECT_ROOT` in `graph_content.py`. Read the relevant files and listed tests, then query another node only when the task calls for it. The map does not contain source contents. A configured directory may be broad; narrow searches within that directory.
+
+The map is manually maintained. Statuses and test paths are declarations, not proof that code works. A missing node or edge does not prove absence of code or callers; use targeted repository search when coverage is insufficient. When a task changes paths, responsibilities or dependencies, update the affected entries in the active description: `graph_edit.json` if present, otherwise `graph_content.py`. The JSON is a full snapshot of descriptive settings and overrides the Python configuration; `PROJECT_ROOT` remains in Python. Do not overwrite unrelated user edits.
+
+`built_at` is the graph build time. `config_newer_than_graph` only checks whether the adjacent Python configuration or editor snapshot is newer than the generated JSON; it does not validate source changes or map completeness. When configuration or freshness information needs updating, run:
+
+```sh
+python -X utf8 build_graph.py
 ```
 
-### Шаг 4: Открыть в браузере
-Запустить `open_graph.bat` или дважды щелкнуть `index.html`.
+The CLI never rebuilds automatically. It reads JSON without executing project configuration. Use `--data /path/to/data/graph.json` before the command to query another generated graph.
 
-## 4. Как ИИ-агенту использовать граф для локального контекста
-Вместо обхода всей файловой системы агент считывает `data/context_nodes.json`:
-1. Находит интересующую подсистему по ключевым словам или `id`.
-2. Получает точный список связанных файлов (`paths`), тестов (`tests`), статус (`status`) и зависимости (`links`).
-3. Читает только релевантные 1–3 файла, экономя контекстное окно и токены.
+For user-facing editing, run `python -X utf8 edit_graph.py` (Python 3.9+). The browser editor saves validated nodes, links and image associations to `graph_edit.json` and rebuilds the viewer and agent index. `index.html` is the read-only viewer. Uploaded thumbnails are stored in `art/`; keep them with the snapshot when moving the tool.
