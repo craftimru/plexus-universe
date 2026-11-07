@@ -5,7 +5,25 @@ description: Navigate and maintain a shared game-project map with bounded CLI or
 
 # Project Universe Graph
 
-Use `graph_agent.py` beside this file (Python 3.9+) or the connected graph MCP tools. Run commands from the tool directory, use a full script path, or pass `--root /path/to/project_graph` before the command. Do not load the whole graph or index into conversation by default.
+This skill bundles an offline viewer, editor and agent CLI (Python 3.9+). Do not load the whole graph or index into conversation by default.
+
+## Select the user's project map first
+
+The skill's own graph is a demonstration. Do not use it as context for a different project. Honor an explicitly supplied map location; otherwise locate the current project's map:
+
+```sh
+python -X utf8 <skill-dir>/scripts/project_graph.py locate --project <project-root>
+```
+
+Discovery checks only the project root, `tools/project_graph`, `tools/project-universe-graph` and `.project_graph`; it does not crawl the repository. If several maps exist, select the one matching the user's task or clarify the choice. If none exists and the user asked to create/adopt a map, initialize a project-local copy:
+
+```sh
+python -X utf8 <skill-dir>/scripts/project_graph.py init --project <project-root>
+```
+
+This creates `tools/project_graph` with one project node, not the RTS demo, and refuses to overwrite an existing nonempty map directory. Review scoped bootstrap suggestions to add real subsystems. Otherwise continue the code task using targeted searches and explain that no map is available rather than creating one without a reason.
+
+For every graph command, target the discovered tool directory explicitly with `--root <map-dir>` before the command, or run its own `graph_agent.py`. Use a connected MCP server only when its configured root is the intended map. Setup and distribution are described in [references/installation.md](references/installation.md).
 
 ## Before and during a task
 
