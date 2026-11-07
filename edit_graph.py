@@ -5,20 +5,14 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os
 from pathlib import Path
-import subprocess
 import runpy
-import sys
 import threading
 from urllib.parse import urlsplit
 import webbrowser
 
-from graph_store import atomic_write, load_document, revision, validate
+from graph_store import Conflict, atomic_write, read_document, save_document
 
 HERE = Path(__file__).resolve().parent
-
-
-class Conflict(ValueError):
-    pass
 
 
 def save_image(root, content):
@@ -32,32 +26,6 @@ def save_image(root, content):
     path.parent.mkdir(exist_ok=True)
     atomic_write(path, content)
     return {"key": key, "path": os.path.relpath(path, project_root).replace("\\", "/")}
-
-
-def save_document(root, document, expected_revision):
-    root = Path(root)
-    if expected_revision != revision(root):
-        raise Conflict("The configuration changed. Reload before saving.")
-    validate(document)
-    overlay = root / "graph_edit.json"
-    files = [overlay] + [root / "data" / name for name in ("graph.js", "graph.json", "context_nodes.json")]
-    before = {path: path.read_bytes() if path.exists() else None for path in files}
-    if before[overlay] is not None:
-        atomic_write(root / "graph_edit.json.bak", before[overlay])
-    try:
-        atomic_write(overlay, (json.dumps(document, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
-        result = subprocess.run([sys.executable, "-X", "utf8", str(root / "build_graph.py")],
-                                cwd=root, capture_output=True, text=True, encoding="utf-8", timeout=60)
-        if result.returncode:
-            raise ValueError("Build failed: " + (result.stderr or result.stdout)[-2000:])
-    except Exception:
-        for path, content in before.items():
-            if content is None:
-                path.unlink(missing_ok=True)
-            else:
-                atomic_write(path, content)
-        raise
-    return revision(root)
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -87,7 +55,8 @@ class Handler(SimpleHTTPRequestHandler):
         if path == "/api/document":
             try:
                 with self.server.lock:
-                    self.json_response(200, {"document": load_document(self.server.root), "revision": revision(self.server.root)})
+                    document, current = read_document(self.server.root)
+                    self.json_response(200, {"document": document, "revision": current})
             except Exception as error:
                 self.json_response(400, {"error": str(error)})
         elif path.startswith("/api/"):
@@ -126,7 +95,8 @@ class Handler(SimpleHTTPRequestHandler):
             payload = json.loads(content)
             with self.server.lock:
                 new_revision = save_document(self.server.root, payload["document"], payload["revision"])
-            self.json_response(200, {"revision": new_revision})
+                document, new_revision = read_document(self.server.root)
+            self.json_response(200, {"revision": new_revision, "document": document})
         except Conflict as error:
             self.json_response(409, {"error": str(error)})
         except Exception as error:

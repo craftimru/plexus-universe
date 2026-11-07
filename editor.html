@@ -27,6 +27,8 @@ details{border-top:1px solid #26314b;margin-top:16px;padding-top:10px}summary{cu
 <section id="form" hidden>
 <label for="label">Название</label><input id="label">
 <label for="human">Описание</label><textarea id="human" rows="4"></textarea>
+<div class="row"><label><input id="needs_review" type="checkbox" style="width:auto"> Нужна проверка</label><label><input id="locked" type="checkbox" style="width:auto"> Закрыт для агента</label></div>
+<p id="humanNotice" class="muted" hidden></p>
 <div class="row"><div><label for="status">Статус</label><select id="status"><option value="idea">Идея</option><option value="art">Арт готов</option><option value="proto">Прототип</option><option value="wip">В разработке</option><option value="live">Работает</option><option value="polished">Отполировано</option><option value="shelved">Отложено</option></select></div><div><label for="tier">Уровень</label><select id="tier"><option value="0">0 · Проект</option><option value="1">1 · Раздел</option><option value="2">2 · Подсистема</option><option value="3">3 · Сущность</option></select></div></div>
 <label for="parent">Родитель</label><select id="parent"></select>
 <label for="paths">Исходники — по одному пути на строку</label><textarea id="paths" rows="3"></textarea>

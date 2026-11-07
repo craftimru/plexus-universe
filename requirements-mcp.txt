@@ -1,0 +1,2 @@
+# Optional, separate from the dependency-free CLI/editor. SDK v1 compatibility line.
+mcp>=1.20,<2

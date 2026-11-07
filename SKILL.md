@@ -1,48 +1,58 @@
 ---
 name: project-universe-graph
-description: Navigate a manually curated game-project graph to find relevant source files, tests, and dependencies using bounded local queries. Use when working in a project that has Project Universe Graph installed.
+description: Navigate and maintain a shared game-project map with bounded CLI or MCP queries, validated updates, and explicit acknowledgement of human edits. Use when working in a project that has Project Universe Graph installed.
 ---
 
 # Project Universe Graph
 
-Use `graph_agent.py` beside this file to navigate the project's map. Commands below run from the tool's directory; from another directory use its full path. The CLI reads the graph internally and returns only the requested records. Do not load the entire `data/graph.json` or `data/context_nodes.json` into conversation by default.
+Use `graph_agent.py` beside this file (Python 3.9+) or the connected graph MCP tools. Run commands from the tool directory, use a full script path, or pass `--root /path/to/project_graph` before the command. Do not load the whole graph or index into conversation by default.
 
-## Find the task's context
+## Before and during a task
 
 ```sh
 python -X utf8 graph_agent.py search "урон"
 python -X utf8 graph_agent.py node sys_damage_model
-python -X utf8 graph_agent.py context sys_damage_model --direction both --depth 1
+python -X utf8 graph_agent.py context sys_damage_model --depth 1 --direction both
 ```
 
-- `search` matches ID, label, description and paths; multiple words must all match. It returns up to five brief cards. Try another term if it finds nothing; search is lexical, not semantic.
-- `node` returns one card with description, source paths, test paths and child IDs.
-- `context` follows explicit dependencies, one hop by default. Use `--direction in` for callers, `out` for dependencies, `both` for both. Parent/child edges are excluded unless `--hierarchy` is added. Maximum depth is three; default node limit is eight.
-- `overview` returns the root and top-level sections, five at a time.
-- `path "src/combat/damage.gd"` finds nodes whose source/test paths cover the given file. More specific matches come first; paths are relative to `PROJECT_ROOT`, or absolute beneath it.
+Read the returned source/test paths relative to `PROJECT_ROOT` in `graph_content.py`. For a changed file, use `path "src/combat/damage.gd"` to find owners. Use targeted code searches when a path names a broad directory or the map lacks coverage; a missing node or edge does not prove absence of code or callers.
 
-For another slice use `--limit` and `--offset` on `search`, `overview` or `path`. Follow `next_offset` to continue. For a child branch, query its ID instead of expanding every branch.
+`context` excludes hierarchy edges by default; use `--hierarchy` deliberately. Search is lexical and requires all words to match. `overview` gives the top level. Queries return compact JSON, normally limited to 6,000 characters; this is not an exact token budget. Follow `next_offset` on paged commands. `truncated`, `node_limit_reached` and `scan_incomplete` explicitly describe limits. Narrow a query before increasing its budget with `--max-chars`.
 
-Output is compact JSON, limited to 6,000 characters by default. Change the budget before the command:
+`rebuild_required` means generated data differs from configuration. Rebuild before relying on it or making bootstrap suggestions. `health` checks the built graph's paths, references and review flags. Add `--scope src` only when a filesystem coverage scan is useful; do not scan the whole project on every task.
+
+## Preserve the user's edits
+
+A node may have `human_edit` with `token`, `at`, `fields`, `acknowledged`, and `human_pending: true`. Read its current text, paths and linked art captions/files. If images changed, inspect the relevant image when it matters to the task. Do not restore an older description or replace human artwork just to match a previous plan.
+
+For pending human edits, run `human-changes ID` to read paged before/after values. **Before continuing affected work, tell the user in commentary what changed and how you will handle it**: what you accept as current intent, what you will preserve, and any conflict with code that needs clarification. Ask only when the meaning is actually unclear. A silent tool acknowledgement is not a user-facing response.
+
+After that explanation, record acknowledgement with the token you actually read and a note describing your intended handling:
 
 ```sh
-python -X utf8 graph_agent.py --max-chars 3000 context sys_damage_model --limit 4
+python -X utf8 graph_agent.py acknowledge-node sys_damage_model --token TOKEN_FROM_NODE --note "Уточнение назначения прочитано; сохраняю формулировку и учту её в задаче" --rebuild
 ```
 
-`truncated: true` means records were removed for the character budget. `node_limit_reached: true` means traversal skipped neighbors at the node limit. Narrow the query, navigate by returned IDs, or deliberately increase the limit/budget if needed. An oversized single card returns an error rather than silently hiding its paths. A character limit is not an exact token count.
+A newer human save invalidates the token. On conflict, read the current node again; do not blindly retry with a new token or revision. Acknowledgement records familiarity, not approval to overwrite the user's choices. `locked` blocks substantive agent changes even after acknowledgement; leave it for the user to unlock. `needs_review` requests review and does not establish that the node is broken.
 
-## Read and maintain the relevant sources
+## Finish the task by maintaining the map
 
-Resolve returned paths relative to `PROJECT_ROOT` in `graph_content.py`. Read the relevant files and listed tests, then query another node only when the task calls for it. The map does not contain source contents. A configured directory may be broad; narrow searches within that directory.
+After relevant code changes:
 
-The map is manually maintained. Statuses and test paths are declarations, not proof that code works. A missing node or edge does not prove absence of code or callers; use targeted repository search when coverage is insufficient. When a task changes paths, responsibilities or dependencies, update the affected entries in the active description: `graph_edit.json` if present, otherwise `graph_content.py`. The JSON is a full snapshot of descriptive settings and overrides the Python configuration; `PROJECT_ROOT` remains in Python. Do not overwrite unrelated user edits.
-
-`built_at` is the graph build time. `config_newer_than_graph` only checks whether the adjacent Python configuration or editor snapshot is newer than the generated JSON; it does not validate source changes or map completeness. When configuration or freshness information needs updating, run:
+1. Use `path` for changed files and inspect the affected nodes. Do not label systems `live`/`polished` solely because code was generated.
+2. If responsibility, paths, tests, dependencies or status changed, use `update-node`, `add-node`, `set-status`, `add-link` or `remove-link`. Make narrow field changes; do not rewrite the whole snapshot or Python configuration. If architecture did not change, do not invent a map update.
+3. For coupled changes, use a reviewed operations file with `apply --file patch.json --dry-run`, then apply the same patch with `--rebuild` and the `--expected-revision` returned by the preview. This validates the final batch together and detects intervening edits.
+4. Query the updated nodes and relevant health results. Report unresolved missing paths or intentional plans; do not silently create placeholder files or clear human review flags to make the report look clean.
 
 ```sh
-python -X utf8 build_graph.py
+python -X utf8 graph_agent.py update-node sys_damage_model --human "Расчёт урона и обработка попаданий" --rebuild
+python -X utf8 graph_agent.py add-link sys_ai_commander sys_damage_model --type calls --label "Запрос атаки" --rebuild
 ```
 
-The CLI never rebuilds automatically. It reads JSON without executing project configuration. Use `--data /path/to/data/graph.json` before the command to query another generated graph.
+Writes go to `graph_edit.json` without rewriting Python, retain unmodified fields, validate hierarchy, record history and use the same save routine as the browser. `--rebuild` is explicit for CLI writes; without it generated queries remain stale. `PROJECT_ROOT` remains in Python. The instruction does not grant authorization for unrelated changes or publishing.
 
-For user-facing editing, run `python -X utf8 edit_graph.py` (Python 3.9+). The browser editor saves validated nodes, links and image associations to `graph_edit.json` and rebuilds the viewer and agent index. `index.html` is the read-only viewer. Uploaded thumbnails are stored in `art/`; keep them with the snapshot when moving the tool.
+For exact operation schemas, flags and patch examples, read [references/agent-api.md](references/agent-api.md) when writing. For new-project suggestions from folders or `@orbit:` markers, use `bootstrap --scope ... --parent ...`, review its operations and descriptions, then dry-run before applying. Never apply a truncated or incomplete suggestion set as though it were a complete import.
+
+## Browser and MCP
+
+Users edit with `python -X utf8 edit_graph.py` or `edit_graph.bat`; `index.html` is the viewer. Browser saves mark human edits automatically and rebuild the agent index. Do not use the human browser endpoint to bypass agent protections. [MCP setup](references/mcp.md) uses optional SDK dependencies and stdio; `graph_apply` is available only when the server was launched with `--allow-write`.

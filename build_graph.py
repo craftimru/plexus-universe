@@ -33,7 +33,7 @@ except ImportError:
         print("Please create graph_content.py based on graph_content.example.py.")
         sys.exit(1)
 
-from graph_store import load_overlay
+from graph_store import atomic_write, load_overlay, revision
 
 # Browser edits override descriptive settings, never the project root or Python code.
 for setting, value in load_overlay(HERE).items():
@@ -183,6 +183,9 @@ for nid, n in raw_nodes.items():
         "flag": n.get("flag"),
         "codex_state": n.get("codex_state", "Активный модуль"),
         "note": n.get("note", ""),
+        "locked": n.get("locked", False),
+        "needs_review": n.get("needs_review", False),
+        "human_edit": n.get("human_edit"),
         "autoexpand": n.get("autoexpand", False),
         "proposed": n.get("proposed", False)
     }
@@ -361,6 +364,9 @@ for nid, n in nodes.items():
         "tests": n["tests"]
     }
     out_nodes.append(item)
+    item["locked"] = n["locked"]
+    item["needs_review"] = n["needs_review"]
+    item["human_edit"] = n["human_edit"]
 
     # Запись в компактный индекс context_nodes для ИИ
     context_nodes[nid] = {
@@ -374,6 +380,9 @@ for nid, n in nodes.items():
         "tests": n["tests"],
         "children": n["children"]
     }
+    context_nodes[nid]["locked"] = n["locked"]
+    context_nodes[nid]["needs_review"] = n["needs_review"]
+    context_nodes[nid]["human_edit"] = n["human_edit"]
 
 fresh_hours = getattr(C, "FRESH_HOURS", 48)
 payload = {
@@ -395,15 +404,16 @@ payload = {
     "arts": ART,
     "source": {
         "project_root": str(PROJECT_ROOT),
+        "config_revision": revision(HERE),
         "total_nodes": len(out_nodes),
         "total_links": len(links)
     }
 }
 
 # Генерация файлов данных
-(DATA_DIR / "graph.js").write_text("window.GRAPH = " + json.dumps(payload, ensure_ascii=False) + ";\n", encoding="utf-8")
-(DATA_DIR / "graph.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-(DATA_DIR / "context_nodes.json").write_text(json.dumps(context_nodes, ensure_ascii=False, indent=2), encoding="utf-8")
+atomic_write(DATA_DIR / "graph.js", ("window.GRAPH = " + json.dumps(payload, ensure_ascii=False) + ";\n").encode("utf-8"))
+atomic_write(DATA_DIR / "graph.json", json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8"))
+atomic_write(DATA_DIR / "context_nodes.json", json.dumps(context_nodes, ensure_ascii=False, indent=2).encode("utf-8"))
 
 fresh = [n for n in out_nodes if n["at"] and (time.time() - n["at"]) < fresh_hours * 3600]
 print(f"=== Project Universe Graph Сборка Завершена ===")

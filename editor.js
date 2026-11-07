@@ -28,6 +28,11 @@ function selectNode(id, focus = false) {
   const n = doc.NODES[id];
   for (const field of ["label", "human", "status", "tier"]) $(field).value = n[field] ?? ({status:"live",tier:2}[field] ?? "");
   for (const field of ["paths", "tests"]) $(field).value = (n[field] || []).join("\n");
+  for (const field of ["locked", "needs_review"]) $(field).checked = !!n[field];
+  $("humanNotice").hidden = !n.human_edit;
+  if (n.human_edit) $("humanNotice").textContent = n.human_edit.acknowledged
+    ? "Агент ознакомился: " + (n.human_edit.acknowledgement?.note || "правки учтены")
+    : "Ваши правки ожидают ознакомления агента. Он должен сообщить, что увидел и как их учтёт.";
   $("parent").replaceChildren(option("", "Нет — корень проекта"), ...Object.keys(doc.NODES).filter(key => key !== id).map(key => option(key, title(key))));
   $("parent").value = n.parent || "";
   $("delete").disabled = !n.parent;
@@ -71,6 +76,7 @@ async function load() {
   message("Выберите узел. Правки сохраняются в graph_edit.json.");
 }
 $("filter").oninput = list;
+for (const field of ["locked", "needs_review"]) $(field).onchange = () => { doc.NODES[selected][field] = $(field).checked; changed(); };
 $("nodes").onchange = () => selectNode($("nodes").value, true);
 for (const field of ["label", "human", "status", "tier", "parent", "paths", "tests"]) {
   $(field).oninput = () => {
@@ -105,7 +111,8 @@ $("save").onclick = async () => {
   if (busy) return; setBusy(true); message("Сохранение и сборка…");
   try {
     const data = await api("/api/document", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({document:doc, revision})});
-    revision = data.revision; dirty = false; mapSelected = null; $("map").contentWindow.location.reload(); message("Сохранено. Карта и индекс агента обновлены.");
+    revision = data.revision; if (data.document) { doc = data.document; selectNode(selected); }
+    dirty = false; mapSelected = null; $("map").contentWindow.location.reload(); message("Сохранено. Карта и индекс агента обновлены.");
   } catch (e) { message(e.message, true); }
   finally { setBusy(false); }
 };
