@@ -1,9 +1,9 @@
 ---
-name: project-universe-graph
-description: Navigate and maintain a shared game-project map with bounded CLI or MCP queries, validated updates, and explicit acknowledgement of human edits. Use when working in a project that has Project Universe Graph installed.
+name: plexus-universe
+description: Navigate and maintain a shared game-project map with bounded CLI or MCP queries, validated updates, and explicit acknowledgement of human edits. Use when working in a project that has Plexus Universe installed.
 ---
 
-# Project Universe Graph
+# Plexus Universe
 
 This skill bundles an offline viewer, editor and agent CLI (Python 3.9+). Do not load the whole graph or index into conversation by default.
 
@@ -15,7 +15,7 @@ The skill's own graph is a demonstration. Do not use it as context for a differe
 python -X utf8 <skill-dir>/scripts/project_graph.py locate --project <project-root>
 ```
 
-Discovery checks only the project root, `tools/project_graph`, `tools/project-universe-graph` and `.project_graph`; it does not crawl the repository. If several maps exist, select the one matching the user's task or clarify the choice. If none exists and the user asked to create/adopt a map, initialize a project-local copy:
+Discovery checks only the project root, `tools/project_graph`, `tools/plexus-universe` and `.project_graph`; it does not crawl the repository. If several maps exist, select the one matching the user's task or clarify the choice. If none exists and the user asked to create/adopt a map, initialize a project-local copy:
 
 ```sh
 python -X utf8 <skill-dir>/scripts/project_graph.py init --project <project-root>
@@ -38,6 +38,8 @@ Read the returned source/test paths relative to `PROJECT_ROOT` in `graph_content
 `context` excludes hierarchy edges by default; use `--hierarchy` deliberately. Search is lexical and requires all words to match. `overview` gives the top level. Queries return compact JSON, normally limited to 6,000 characters; this is not an exact token budget. Follow `next_offset` on paged commands. `truncated`, `node_limit_reached` and `scan_incomplete` explicitly describe limits. Narrow a query before increasing its budget with `--max-chars`.
 
 `rebuild_required` means generated data differs from configuration. Rebuild before relying on it or making bootstrap suggestions. `health` checks the built graph's paths, references and review flags. Add `--scope src` only when a filesystem coverage scan is useful; do not scan the whole project on every task.
+
+Freshness uses own node content/file/art changes (`at`) and the latest change anywhere in its descendants (`agg_at`). A leaf edit must propagate to every ancestor without refreshing unrelated branches. Rebuilds and human-edit acknowledgements are not content changes. Preserve `data/freshness.json` when updating a map; use `scripts/project_graph.py update --map <map-dir>` from a fresh skill checkout instead of replacing working configuration or data with the demo. Reload an open viewer after an external rebuild.
 
 ## Preserve the user's edits
 

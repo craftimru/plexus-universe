@@ -15,7 +15,7 @@ python -m pip install -r requirements-mcp.txt
 ```json
 {
   "mcpServers": {
-    "project-universe-graph": {
+    "plexus-universe": {
       "command": "C:/Path/to/venv/Scripts/python.exe",
       "args": ["-X", "utf8", "D:/MyGame/tools/project_graph/graph_mcp.py", "--root", "D:/MyGame/tools/project_graph"]
     }

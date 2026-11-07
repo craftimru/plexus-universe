@@ -29,3 +29,4 @@ desktop.ini
 # Previous editor save (the current graph_edit.json is shareable project data)
 graph_edit.json.bak
 graph_write.lock
+data/freshness.json

@@ -1,5 +1,5 @@
 """
-Сборщик графа проекта (Project Universe Graph) для интерактивного 3D-просмотрщика.
+Сборщик графа проекта (Plexus Universe) для интерактивного 3D-просмотрщика.
 Запуск: python -X utf8 build_graph.py
 Автоматически считывает конфигурацию из graph_content.py, сканирует структуру проекта,
 вычисляет время свежести файлов через git и mtime, формирует арты, связи и зависимости.
@@ -186,6 +186,7 @@ for nid, n in raw_nodes.items():
         "locked": n.get("locked", False),
         "needs_review": n.get("needs_review", False),
         "human_edit": n.get("human_edit"),
+        "updated_at": n.get("updated_at"),
         "autoexpand": n.get("autoexpand", False),
         "proposed": n.get("proposed", False)
     }
@@ -225,23 +226,70 @@ for nid, n in nodes.items():
             })
 
 # ---------------------------------------------------------------- Расчет свежести и файлов
+cache_path = DATA_DIR / "freshness.json"
+try:
+    previous_freshness = json.loads(cache_path.read_text(encoding="utf-8")).get("nodes", {})
+except (OSError, ValueError):
+    previous_freshness = {}
+freshness = {}
+config_time = max((p.stat().st_mtime for p in (HERE / "graph_content.py", HERE / "graph_edit.json") if p.exists()), default=0)
+history_times = {}
+history_path = HERE / "graph_history.jsonl"
+if history_path.exists():
+    for line in history_path.read_text(encoding="utf-8").splitlines():
+        try:
+            event = json.loads(line)
+            diff = event.get("diff", {})
+            touched = {c["id"] for c in diff.get("nodes", []) if set(c.get("fields", [])) - {"human_edit", "updated_at"}}
+            for link in diff.get("links_added", []) + diff.get("links_removed", []):
+                touched.update((link["source"], link["target"]))
+            for key in touched:
+                history_times[key] = max(history_times.get(key, 0), event["at"])
+        except (ValueError, KeyError, TypeError):
+            continue
+
 for nid, n in nodes.items():
     files = []
-    for p in n["paths"]:
+    for p in dict.fromkeys(n["paths"] + n["tests"]):
         files += expand_paths(p)
     n["_files"] = files
-    n["at"] = max([t for _, t in files], default=None)
-    n["changes"] = [{"path": f, "at": t} for f, t in sorted(files, key=lambda x: -x[1])[:5]]
+    art_keys = {n.get("hero_key"), *n["arts"], *n["sat_keys"]} - {None}
+    declared_arts = [a for a in getattr(C, "CUSTOM_ARTS", []) if a["key"] in art_keys]
+    content = {k: v for k, v in raw_nodes[nid].items() if k not in ("human_edit", "updated_at")}
+    relevant_links = [l for l in getattr(C, "LINKS", []) if nid in (l.get("source"), l.get("target"))]
+    fingerprint = hashlib.sha256(json.dumps([content, relevant_links, declared_arts], sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
+    old = previous_freshness.get(nid, {})
+    declared_at = max(n.get("updated_at") or 0, (n.get("human_edit") or {}).get("at", 0), history_times.get(nid, 0))
+    if old.get("fingerprint") == fingerprint:
+        content_at = max(old.get("at", 0), declared_at)
+    elif old:
+        observed_at = max(declared_at, int(config_time))
+        content_at = declared_at if declared_at > old.get("at", 0) else observed_at if observed_at > old.get("at", 0) else int(time.time())
+    else:
+        content_at = declared_at or int(config_time)
+    freshness[nid] = {"fingerprint": fingerprint, "at": content_at}
+    n["content_at"] = content_at or None
+    n["source_at"] = max([t for _, t in files], default=None)
+    n["art_at"] = max([ART[k].get("at") or 0 for k in art_keys if k in ART], default=0) or None
+    n["at"] = max(content_at, n["source_at"] or 0, n["art_at"] or 0) or None
+    changes = [{"path": f, "at": t} for f, t in files]
+    if content_at:
+        changes.append({"path": "Описание узла в графе", "at": content_at, "kind": "graph"})
+    if n["art_at"]:
+        changes.append({"path": "Изображения узла", "at": n["art_at"], "kind": "art"})
+    n["changes"] = sorted(changes, key=lambda c: -c["at"])[:5]
 
     # Фасеты (грани)
     facets = []
     has_code = any(f.endswith(".gd") or f.endswith(".py") or f.endswith(".cs") or f.endswith(".cpp") for f, _ in files)
-    facets.append({"k": "code", "label": "код", "on": has_code, "at": n["at"]})
+    code_at = max([t for f, t in files if Path(f).suffix in (".gd", ".py", ".cs", ".cpp")], default=None)
+    facets.append({"k": "code", "label": "код", "on": has_code, "at": code_at})
     has_tests = bool(n["tests"])
-    facets.append({"k": "tests", "label": "тесты " + ", ".join(n["tests"]) if n["tests"] else "тесты", "on": has_tests, "at": n["at"] if has_tests else None})
+    test_times = [t for f, t in files if any(f == p.rstrip("/") or f.startswith(p.rstrip("/") + "/") for p in n["tests"])]
+    facets.append({"k": "tests", "label": "тесты " + ", ".join(n["tests"]) if n["tests"] else "тесты", "on": has_tests, "at": max(test_times, default=None)})
     has_docs = any(f.endswith(".md") or f.endswith(".txt") for f, _ in files)
     if has_docs:
-        facets.append({"k": "docs", "label": "GDD/доки", "on": True, "at": n["at"]})
+        facets.append({"k": "docs", "label": "GDD/доки", "on": True, "at": max(t for f, t in files if f.endswith((".md", ".txt")))})
     n["facets"] = facets
 
 # ---------------------------------------------------------------- Иерархия детей и семейств
@@ -367,6 +415,7 @@ for nid, n in nodes.items():
     item["locked"] = n["locked"]
     item["needs_review"] = n["needs_review"]
     item["human_edit"] = n["human_edit"]
+    item.update(content_at=n["content_at"], source_at=n["source_at"], art_at=n["art_at"])
 
     # Запись в компактный индекс context_nodes для ИИ
     context_nodes[nid] = {
@@ -414,8 +463,9 @@ payload = {
 atomic_write(DATA_DIR / "graph.js", ("window.GRAPH = " + json.dumps(payload, ensure_ascii=False) + ";\n").encode("utf-8"))
 atomic_write(DATA_DIR / "graph.json", json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8"))
 atomic_write(DATA_DIR / "context_nodes.json", json.dumps(context_nodes, ensure_ascii=False, indent=2).encode("utf-8"))
+atomic_write(cache_path, json.dumps({"version": 1, "nodes": freshness}, ensure_ascii=False, indent=2).encode("utf-8"))
 
 fresh = [n for n in out_nodes if n["at"] and (time.time() - n["at"]) < fresh_hours * 3600]
-print(f"=== Project Universe Graph Сборка Завершена ===")
+print(f"=== Plexus Universe Сборка Завершена ===")
 print(f"Узлов: {len(out_nodes)}, Связей: {len(links)}, Артов: {len(ART)}")
 print(f"Свежих за {fresh_hours} ч: {len(fresh)}")

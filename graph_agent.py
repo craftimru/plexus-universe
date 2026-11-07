@@ -50,7 +50,7 @@ class Graph:
             return result
         result.update(summary=node.get("human", ""), paths=node.get("paths", []),
                       tests=node.get("tests", []), children=node.get("children", []),
-                      at=node.get("at"), locked=node.get("locked", False), needs_review=node.get("needs_review", False))
+                      at=node.get("at"), agg_at=node.get("agg_at"), locked=node.get("locked", False), needs_review=node.get("needs_review", False))
         if node.get("human_edit"):
             result["human_edit"] = {key: value for key, value in node["human_edit"].items() if key != "changes"}
             result["human_edit"]["change_count"] = len(node["human_edit"].get("changes", []))

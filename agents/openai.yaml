@@ -1,4 +1,4 @@
 interface:
-  display_name: "Project Universe Graph"
+  display_name: "Plexus Universe"
   short_description: "Карта проекта для человека и ИИ-агента"
-  default_prompt: "Используй $project-universe-graph, чтобы найти нужные системы проекта, учесть мои правки и обновить карту после задачи."
+  default_prompt: "Используй $plexus-universe, чтобы найти нужные системы проекта, учесть мои правки и обновить карту после задачи."

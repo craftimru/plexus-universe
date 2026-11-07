@@ -87,6 +87,8 @@ def validate(document):
         for field in ("locked", "needs_review", "proposed", "autoexpand"):
             if field in node and type(node[field]) is not bool:
                 raise ValueError("Expected a boolean: " + field)
+        if "updated_at" in node and (type(node["updated_at"]) not in (int, float) or not math.isfinite(node["updated_at"]) or node["updated_at"] < 0):
+            raise ValueError("Invalid updated_at: " + key)
         stamp = node.get("human_edit")
         if stamp is not None:
             if (not isinstance(stamp, dict) or not isinstance(stamp.get("token"), str) or not stamp["token"]
@@ -270,6 +272,28 @@ def check_human_edits(before, after, acknowledged=None):
                 raise ValueError("Human edits require reading and acknowledgement first: " + key)
 
 
+def stamp_node_updates(before, after):
+    """Metadata reads/acknowledgements and rebuilds are not content edits."""
+    old, new = copy.deepcopy(before), copy.deepcopy(after)
+    for document in (old, new):
+        for node in document["NODES"].values():
+            node.pop("human_edit", None)
+            node.pop("updated_at", None)
+    touched = affected_nodes(old, new)
+    old_art = {a["key"]: a for a in old.get("CUSTOM_ARTS", [])}
+    new_art = {a["key"]: a for a in new.get("CUSTOM_ARTS", [])}
+    changed_art = {key for key in old_art.keys() | new_art.keys() if old_art.get(key) != new_art.get(key)}
+    now = int(time.time())
+    for key, node in after["NODES"].items():
+        art_keys = {node.get("hero"), *node.get("arts", []), *node.get("sats", [])}
+        if key in touched or art_keys & changed_art:
+            node["updated_at"] = now
+        elif "updated_at" in before["NODES"].get(key, {}):
+            node["updated_at"] = before["NODES"][key]["updated_at"]
+        else:
+            node.pop("updated_at", None)
+
+
 def save_document(root, document, expected_revision, rebuild=True, actor="human", summary="", acknowledged=None):
     """Commit an overlay, optional build and audit event under one writer lock.
 
@@ -288,10 +312,11 @@ def save_document(root, document, expected_revision, rebuild=True, actor="human"
             check_human_edits(before_doc, document, acknowledged)
         else:
             stamp_human_edits(before_doc, document)
+        stamp_node_updates(before_doc, document)
         overlay = root / "graph_edit.json"
         history = root / "graph_history.jsonl"
         backup = root / "graph_edit.json.bak"
-        files = [overlay, history, backup] + [root / "data" / name for name in ("graph.js", "graph.json", "context_nodes.json")]
+        files = [overlay, history, backup] + [root / "data" / name for name in ("graph.js", "graph.json", "context_nodes.json", "freshness.json")]
         before = {path: path.read_bytes() if path.exists() else None for path in files}
         try:
             if before[overlay] is not None:

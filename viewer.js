@@ -5,13 +5,13 @@
   const $ = (id) => document.getElementById(id);
   if (!G || typeof THREE === "undefined") { const e = $("err"); e.style.display = "block"; e.textContent = "Нет данных графа или three.js: запусти build_graph.py и открой страницу через локальный сервер."; return; }
   if (G.project) {
-    document.title = G.project + " · Project Universe Graph";
+    document.title = G.project + " · Plexus Universe";
     const brand = $("brand");
     if (brand) brand.innerHTML = "<i></i>" + G.project + " · карта проекта";
   }
 
   const V3 = THREE.Vector3;
-  const NOW = G.built_at && Math.abs(Date.now() / 1000 - G.built_at) < 86400 * 30 ? Date.now() / 1000 : Date.now() / 1000;
+  const NOW = Date.now() / 1000;
   const FRESH_S = G.fresh_hours * 3600;
   const STATUS = { idea: 0, art: 1, proto: 2, wip: 3, live: 4, polished: 5, shelved: 6 };
   const SCOL = { idea: "#8aa0c8", art: "#b690ff", proto: "#ffb347", wip: "#4fd8ff", live: "#3ee58f", polished: "#ffe39a", shelved: "#667089" };
@@ -193,7 +193,7 @@
   const seenP = {}; const news = []; newsItems.forEach((n) => { const k = n.changes[0] && n.changes[0].path; if (news.length < 7 && !seenP[n.id]) { seenP[n.id] = 1; news.push(n); } });
   $("newsList").innerHTML = news.map((n) => `<div class="it" data-id="${n.id}"><span class="dot" style="background:${n.color};color:${n.color}"></span><div><b style="color:${n.color}">${n.label}</b><small>${ago(n.at)} · ${(n.changes[0] ? n.changes[0].path.split("/").pop() : "")}</small></div></div>`).join("") || '<div class="it"><small>За 48 часов изменений нет</small></div>';
   $("newsList").onclick = (e) => { const it = e.target.closest(".it"); if (it && it.dataset.id) goTo(N[it.dataset.id]); };
-  const freshCount = G.nodes.filter((n) => n.freshOwn > 0).length; $("freshN").textContent = "· " + freshCount;
+  const freshCount = G.nodes.filter((n) => n.freshOwn > 0 || n.fresh > 0).length; $("freshN").textContent = "· " + freshCount;
   const stNames = G.status_names;
   $("legBody").innerHTML = Object.keys(STATUS).map((k) => `<div class="row" data-s="${k}"><span class="ring ${k === "idea" || k === "proto" ? "dash" : k === "shelved" ? "dot2" : ""}" style="border-color:${SCOL[k]};${k === "wip" ? "border-right-color:transparent" : ""}"></span>${stNames[k]}</div>`).join("")
     + `<hr><div class="row" style="cursor:default"><span class="dot" style="background:#ffe39a;box-shadow:0 0 8px #ffe39a"></span>мерцает: менялось за 48 ч</div>`
@@ -363,7 +363,7 @@
     G.nodes.forEach((n) => { const e = n.el; if (!n.sp || n.alpha < 0.2) { e.style.opacity = 0; return; } const near = n.sp.dist < 520;
       const inSub = focus.tier > 0 && (n === focus || anc(n).includes(focus)); const show = n.tier <= 1 || (n.tier === 2 && n.dim > 0.5) || inSub || n === hover || n === selected || (near && n.vis > 0.6 && n.dim > 0.5);
       if (!show) { e.style.opacity = 0; return; } const off = 14 + n.size * 1.6 * (uni.uScale.value / n.sp.dist) * 0.5;
-      const fr = n.freshAt && NOW - n.freshAt < FRESH_S && n.freshOwn > 0; n.sm.textContent = fr ? "● " + ago(n.freshAt) : ""; e.classList.toggle("fresh", !!fr);
+      const fr = n.freshAt && NOW - n.freshAt < FRESH_S; n.sm.textContent = fr ? "● " + ago(n.freshAt) : ""; e.classList.toggle("fresh", !!fr);
       if (!n.lw) { n.lw = e.offsetWidth || 90; n.lh = e.offsetHeight || 16; } items.push({ n, x: n.sp.x, y: n.sp.y + off, w: n.lw, h: n.lh, pri: (n === hover ? -2 : n === selected ? -1 : 0) * 10 + n.tier }); });
     items.sort((a, b) => a.pri - b.pri); const placed = [];
     items.forEach((it) => { let y = it.y, tries = 0; const hit = (yy) => placed.some((p) => Math.abs(p.x - it.x) < (p.w + it.w) / 2 + 4 && Math.abs(p.y - yy) < (p.h + it.h) / 2 + 1);

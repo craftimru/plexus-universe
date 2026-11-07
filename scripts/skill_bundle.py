@@ -5,7 +5,7 @@ import shutil
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-NAME = "project-universe-graph"
+NAME = "plexus-universe"
 RUNTIME = (
     "build_graph.py", "edit_graph.py", "edit_graph.bat", "editor.html", "editor.js",
     "graph_agent.py", "graph_store.py", "graph_health.py", "graph_updates.py", "graph_mcp.py",

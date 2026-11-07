@@ -15,7 +15,7 @@ def create_server(root, allow_write=False):
     except ImportError as error:
         raise RuntimeError("MCP needs Python 3.10+ and: python -m pip install -r requirements-mcp.txt") from error
     root = Path(root).resolve()
-    mcp = FastMCP("project-universe-graph")
+    mcp = FastMCP("plexus-universe")
 
     def query(arguments, max_chars):
         if not 512 <= max_chars <= 100000:
