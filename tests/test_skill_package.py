@@ -51,7 +51,7 @@ class SkillPackageTests(unittest.TestCase):
         graph = json.loads((tool / "data" / "graph.json").read_text(encoding="utf-8"))
         self.assertEqual(graph["project"], "My Game")
         self.assertEqual(len(graph["nodes"]), 1)
-        self.assertEqual(Path(graph["source"]["project_root"]), project)
+        self.assertEqual(Path(graph["source"]["project_root"]).resolve(), project.resolve())
         self.assertEqual(source.read_text(encoding="utf-8"), "extends Node")
         self.assertEqual(locate(project), [str(tool)])
         with self.assertRaises(ValueError):
